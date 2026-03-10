@@ -13,6 +13,13 @@
 */storage/framework/sessions
 */storage/framework/views
 
+# Bootstrap cache (runtime, not source)
+*/bootstrap/cache/*.php
+
+# PHPUnit caches
+*/.phpunit.result.cache
+*/.phpunit.cache/
+
 # Docker volumes
 .docker/
 

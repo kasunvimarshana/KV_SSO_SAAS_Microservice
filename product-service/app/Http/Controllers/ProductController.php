@@ -5,27 +5,35 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Routing\Controller as BaseController;
 
 class ProductController extends BaseController
 {
+    /** Returns 'ilike' for PostgreSQL, 'like' for other drivers (e.g., SQLite in tests) */
+    private function likeOp(): string
+    {
+        return DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
+    }
+
     public function index(Request $request): JsonResponse
     {
         $tenantId = $request->input('tenant_id');
+        $like = $this->likeOp();
 
         $products = Product::where('tenant_id', $tenantId)
             ->with('category')
             ->when($request->category_id, fn($q, $c) => $q->where('category_id', $c))
             ->when($request->is_active !== null,
                 fn($q) => $q->where('is_active', filter_var($request->is_active, FILTER_VALIDATE_BOOLEAN)))
-            ->when($request->name, function ($q, $n) {
+            ->when($request->name, function ($q, $n) use ($like) {
                 $safe = str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $n);
-                $q->where('name', 'ilike', "%{$safe}%");
+                $q->where('name', $like, "%{$safe}%");
             })
-            ->when($request->code, function ($q, $c) {
+            ->when($request->code, function ($q, $c) use ($like) {
                 $safe = str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $c);
-                $q->where('code', 'ilike', "%{$safe}%");
+                $q->where('code', $like, "%{$safe}%");
             })
             ->paginate($request->input('per_page', 15));
 
@@ -35,14 +43,15 @@ class ProductController extends BaseController
     public function search(Request $request): JsonResponse
     {
         $tenantId = $request->input('tenant_id');
-        $query = $request->input('q', '');
+        $query    = $request->input('q', '');
+        $like     = $this->likeOp();
 
         $products = Product::where('tenant_id', $tenantId)
-            ->where(function ($q) use ($query) {
+            ->where(function ($q) use ($query, $like) {
                 $safe = str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $query);
-                $q->where('name', 'ilike', "%{$safe}%")
-                  ->orWhere('code', 'ilike', "%{$safe}%")
-                  ->orWhere('description', 'ilike', "%{$safe}%");
+                $q->where('name', $like, "%{$safe}%")
+                  ->orWhere('code', $like, "%{$safe}%")
+                  ->orWhere('description', $like, "%{$safe}%");
             })
             ->with('category')
             ->limit(50)

@@ -34,7 +34,7 @@ jobs:
 
       - name: Run Auth Service Tests
         working-directory: auth-service
-        run: php artisan test --env=testing
+        run: ./vendor/bin/phpunit --configuration phpunit.xml
 
   user-service-tests:
     name: User Service Tests
@@ -60,7 +60,7 @@ jobs:
 
       - name: Run User Service Tests
         working-directory: user-service
-        run: php artisan test --env=testing
+        run: ./vendor/bin/phpunit --configuration phpunit.xml
 
   product-service-tests:
     name: Product Service Tests
@@ -86,7 +86,7 @@ jobs:
 
       - name: Run Product Service Tests
         working-directory: product-service
-        run: php artisan test --env=testing
+        run: ./vendor/bin/phpunit --configuration phpunit.xml
 
   inventory-service-tests:
     name: Inventory Service Tests
@@ -112,7 +112,7 @@ jobs:
 
       - name: Run Inventory Service Tests
         working-directory: inventory-service
-        run: php artisan test --env=testing
+        run: ./vendor/bin/phpunit --configuration phpunit.xml
 
   order-service-tests:
     name: Order Service Tests
@@ -138,4 +138,4 @@ jobs:
 
       - name: Run Order Service Tests
         working-directory: order-service
-        run: php artisan test --env=testing
+        run: ./vendor/bin/phpunit --configuration phpunit.xml

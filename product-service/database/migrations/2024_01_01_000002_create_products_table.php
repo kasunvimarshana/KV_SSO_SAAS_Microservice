@@ -18,7 +18,7 @@ return new class extends Migration
             $table->decimal('price', 12, 2)->default(0);
             $table->decimal('cost', 12, 2)->default(0);
             $table->string('unit')->default('pcs');
-            $table->jsonb('attributes')->default('{}');
+            $table->json('attributes')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
             $table->softDeletes();
