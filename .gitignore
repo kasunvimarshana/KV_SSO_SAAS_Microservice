@@ -1,0 +1,26 @@
+# Env files (keep examples, ignore actual)
+.env
+*.env
+
+# Vendor directories
+*/vendor/
+*/node_modules/
+
+# Laravel storage (keep directory, not contents)
+*/storage/logs/*.log
+*/storage/app/public
+*/storage/framework/cache/data
+*/storage/framework/sessions
+*/storage/framework/views
+
+# Docker volumes
+.docker/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
