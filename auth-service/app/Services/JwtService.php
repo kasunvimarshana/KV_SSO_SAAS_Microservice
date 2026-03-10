@@ -61,20 +61,42 @@ class JwtService
 
     public function refreshToken(string $token): ?string
     {
-        // Allow expired tokens within 1 day refresh window
+        // Allow expired tokens within 1 day refresh window by manually parsing payload
         try {
-            JWT::$leeway = 86400; // 1 day leeway for refresh
-            try {
-                $decoded = JWT::decode($token, new Key($this->secret, 'HS256'));
-            } finally {
-                JWT::$leeway = 0;
+            $parts = explode('.', $token);
+            if (count($parts) !== 3) {
+                return null;
             }
 
-            $userId = $decoded->sub ?? null;
-            if (!$userId) return null;
+            // Decode the payload without signature verification to inspect exp
+            $payloadJson = base64_decode(strtr($parts[1], '-_', '+/'));
+            $payload = json_decode($payloadJson, true);
+            if (!$payload) {
+                return null;
+            }
+
+            // Reject if expired more than 1 day ago
+            $exp = $payload['exp'] ?? 0;
+            if ($exp < (time() - 86400)) {
+                return null;
+            }
+
+            // Now verify signature (ignoring expiry by catching ExpiredException)
+            try {
+                JWT::decode($token, new Key($this->secret, 'HS256'));
+            } catch (ExpiredException) {
+                // Expected for expired but refreshable tokens - signature was valid
+            }
+
+            $userId = $payload['sub'] ?? null;
+            if (!$userId) {
+                return null;
+            }
 
             $user = \App\Models\User::with('tenant')->find($userId);
-            if (!$user || !$user->is_active) return null;
+            if (!$user || !$user->is_active) {
+                return null;
+            }
 
             $this->blacklistToken($token);
             return $this->generateToken($user);
