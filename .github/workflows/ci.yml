@@ -1,0 +1,141 @@
+name: CI - Microservices Tests
+
+on:
+  push:
+    branches: [ main, develop, "copilot/**" ]
+  pull_request:
+    branches: [ main, develop ]
+
+permissions:
+  contents: read
+
+jobs:
+  auth-service-tests:
+    name: Auth Service Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo, pdo_sqlite, pdo_mysql, mbstring, bcmath, redis
+          coverage: none
+
+      - name: Install Auth Service Dependencies
+        working-directory: auth-service
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Copy Auth Service .env
+        working-directory: auth-service
+        run: cp .env.example .env && php artisan key:generate
+
+      - name: Run Auth Service Tests
+        working-directory: auth-service
+        run: ./vendor/bin/phpunit --configuration phpunit.xml
+
+  user-service-tests:
+    name: User Service Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo, pdo_sqlite, pdo_mysql, mbstring, bcmath, redis
+          coverage: none
+
+      - name: Install User Service Dependencies
+        working-directory: user-service
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Copy User Service .env
+        working-directory: user-service
+        run: cp .env.example .env && php artisan key:generate
+
+      - name: Run User Service Tests
+        working-directory: user-service
+        run: ./vendor/bin/phpunit --configuration phpunit.xml
+
+  product-service-tests:
+    name: Product Service Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo, pdo_sqlite, pdo_pgsql, mbstring, bcmath, redis
+          coverage: none
+
+      - name: Install Product Service Dependencies
+        working-directory: product-service
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Copy Product Service .env
+        working-directory: product-service
+        run: cp .env.example .env && php artisan key:generate
+
+      - name: Run Product Service Tests
+        working-directory: product-service
+        run: ./vendor/bin/phpunit --configuration phpunit.xml
+
+  inventory-service-tests:
+    name: Inventory Service Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo, pdo_sqlite, pdo_mysql, mbstring, bcmath, redis
+          coverage: none
+
+      - name: Install Inventory Service Dependencies
+        working-directory: inventory-service
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Copy Inventory Service .env
+        working-directory: inventory-service
+        run: cp .env.example .env && php artisan key:generate
+
+      - name: Run Inventory Service Tests
+        working-directory: inventory-service
+        run: ./vendor/bin/phpunit --configuration phpunit.xml
+
+  order-service-tests:
+    name: Order Service Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo, pdo_sqlite, pdo_mysql, mbstring, bcmath, redis
+          coverage: none
+
+      - name: Install Order Service Dependencies
+        working-directory: order-service
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Copy Order Service .env
+        working-directory: order-service
+        run: cp .env.example .env && php artisan key:generate
+
+      - name: Run Order Service Tests
+        working-directory: order-service
+        run: ./vendor/bin/phpunit --configuration phpunit.xml
