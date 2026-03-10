@@ -536,7 +536,7 @@ JWT_SECRET=your_shared_secret_min_32_chars_here
 
 ```yaml
 Services:
-  mysql:5432       # auth_db, user_db, inventory_db, order_db
+  mysql:3306       # auth_db, user_db, inventory_db, order_db
   postgres:5432    # product_db
   redis:6379       # Cache, sessions, queues
   auth-service     # :8001
